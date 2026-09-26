@@ -1,4 +1,4 @@
-import { PortalFrame } from './components/PortalFrame.tsx'
+import { PaymentContainer } from './components/PaymentContainer.tsx'
 import { Unauthorized } from './components/Unauthorized.tsx'
 import { useTokenAuth } from './hooks/useTokenAuth.ts'
 
@@ -13,15 +13,7 @@ function App() {
     return <Unauthorized />
   }
 
-  return (
-    <main>
-      <h1>Contenedor de pagos</h1>
-      <p>
-        Usuario: <strong>{auth.user.name}</strong> ({auth.user.email})
-      </p>
-      <PortalFrame />
-    </main>
-  )
+  return <PaymentContainer user={auth.user} />
 }
 
 export default App

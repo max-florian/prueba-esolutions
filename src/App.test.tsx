@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { act, render, screen } from '@testing-library/react'
 import { http, HttpResponse } from 'msw'
 import { StrictMode } from 'react'
 import { beforeEach, describe, expect, it } from 'vitest'
@@ -60,5 +60,38 @@ describe('Acceso por token', () => {
     render(<App />)
 
     expect(await screen.findByRole('heading', { name: /acceso no autorizado/i })).toBeInTheDocument()
+  })
+})
+
+describe('Mensajes del portal', () => {
+  async function renderAuthorized() {
+    setUrl(`/?token=${VALID_TOKEN}`)
+    render(<App />)
+    await screen.findByText(MOCK_USER.name)
+    return screen.getByTitle<HTMLIFrameElement>('Portal de pagos')
+  }
+
+  function post(data: unknown, origin: string, source: Window | null) {
+    act(() => {
+      window.dispatchEvent(new MessageEvent('message', { data, origin, source }))
+    })
+  }
+
+  const payment = { type: 'payment.applied', paymentId: 'pay_123' }
+
+  it('ignora un pago enviado desde un origen no permitido', async () => {
+    const iframe = await renderAuthorized()
+
+    post(payment, 'http://evil.example.com', iframe.contentWindow)
+
+    expect(screen.queryByText(/pago recibido/i)).not.toBeInTheDocument()
+  })
+
+  it('procesa un pago enviado desde el portal configurado', async () => {
+    const iframe = await renderAuthorized()
+
+    post(payment, 'http://localhost:5174', iframe.contentWindow)
+
+    expect(screen.getByText('Pago recibido: pay_123')).toBeInTheDocument()
   })
 })
