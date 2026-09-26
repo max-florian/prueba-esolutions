@@ -1,3 +1,4 @@
+import { PortalFrame } from './components/PortalFrame.tsx'
 import { Unauthorized } from './components/Unauthorized.tsx'
 import { useTokenAuth } from './hooks/useTokenAuth.ts'
 
@@ -18,6 +19,7 @@ function App() {
       <p>
         Usuario: <strong>{auth.user.name}</strong> ({auth.user.email})
       </p>
+      <PortalFrame />
     </main>
   )
 }

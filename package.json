@@ -4,7 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "concurrently -n app,portal -c blue,magenta \"npm:dev:app\" \"npm:dev:portal\"",
+    "dev:app": "vite",
+    "dev:portal": "vite portal",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",

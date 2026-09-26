@@ -34,6 +34,7 @@ describe('Acceso por token', () => {
 
     expect(await screen.findByText(MOCK_USER.name)).toBeInTheDocument()
     expect(window.location.search).toBe('')
+    expect(screen.getByTitle('Portal de pagos')).toHaveAttribute('src', 'http://localhost:5174/')
   })
 
   it('muestra acceso no autorizado sin token y no llama a la API', async () => {
@@ -48,6 +49,7 @@ describe('Acceso por token', () => {
     render(<App />)
 
     expect(screen.getByRole('heading', { name: /acceso no autorizado/i })).toBeInTheDocument()
+    expect(screen.queryByTitle('Portal de pagos')).not.toBeInTheDocument()
     expect(called).toBe(false)
   })
 

@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Portal de pagos</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 1rem;
+        font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+        background: #f6f8fa;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Portal de pagos (simulado)</h2>
+    <p>Esta página se sirve desde otro origen y se comunica con el contenedor por postMessage.</p>
+    <button id="apply-payment" type="button">Aplicar pago</button>
+    <p id="status" role="status"></p>
+    <script type="module" src="./portal.js"></script>
+  </body>
+</html>
