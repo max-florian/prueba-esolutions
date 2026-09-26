@@ -1,4 +1,5 @@
 import { act, render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { http, HttpResponse } from 'msw'
 import { StrictMode } from 'react'
 import { beforeEach, describe, expect, it } from 'vitest'
@@ -84,14 +85,24 @@ describe('Mensajes del portal', () => {
 
     post(payment, 'http://evil.example.com', iframe.contentWindow)
 
-    expect(screen.queryByText(/pago recibido/i)).not.toBeInTheDocument()
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
 
-  it('procesa un pago enviado desde el portal configurado', async () => {
+  it('abre el modal con un pago del portal y al cerrarlo no recarga el iframe', async () => {
+    const user = userEvent.setup()
     const iframe = await renderAuthorized()
+    const iframeWindow = iframe.contentWindow
 
     post(payment, 'http://localhost:5174', iframe.contentWindow)
 
-    expect(screen.getByText('Pago recibido: pay_123')).toBeInTheDocument()
+    const dialog = screen.getByRole('dialog', { name: 'Enviar comprobante' })
+    expect(dialog).toHaveTextContent('pay_123')
+
+    await user.click(screen.getByRole('button', { name: 'Cerrar' }))
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    // Mismo nodo y misma ventana: el iframe no se desmontó ni navegó.
+    expect(screen.getByTitle('Portal de pagos')).toBe(iframe)
+    expect(iframe.contentWindow).toBe(iframeWindow)
   })
 })

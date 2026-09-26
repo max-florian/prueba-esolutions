@@ -9,3 +9,40 @@ body {
   margin: 0;
   padding: 1.5rem;
 }
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgb(0 0 0 / 0.45);
+}
+
+.modal {
+  width: min(100%, 32rem);
+  padding: 1.5rem;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.modal h2 {
+  margin-top: 0;
+}
+
+.row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.row input {
+  flex: 1;
+}
+
+.actions {
+  justify-content: flex-end;
+}
+
+.error {
+  color: #cf222e;
+}

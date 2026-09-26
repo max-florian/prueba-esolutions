@@ -1,8 +1,9 @@
-import { useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import type { User } from '../api/auth.ts'
 import { config } from '../config.ts'
 import { usePortalMessages } from '../hooks/usePortalMessages.ts'
 import { PortalFrame } from './PortalFrame.tsx'
+import { ReceiptModal } from './ReceiptModal.tsx'
 
 interface PaymentContainerProps {
   user: User
@@ -11,6 +12,7 @@ interface PaymentContainerProps {
 export function PaymentContainer({ user }: PaymentContainerProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null)
   const [paymentId, setPaymentId] = useState<string | null>(null)
+  const closeModal = useCallback(() => setPaymentId(null), [])
 
   usePortalMessages({
     allowedOrigin: config.portalOrigin,
@@ -24,8 +26,9 @@ export function PaymentContainer({ user }: PaymentContainerProps) {
       <p>
         Usuario: <strong>{user.name}</strong> ({user.email})
       </p>
-      {paymentId && <p role="status">Pago recibido: {paymentId}</p>}
+      {/* El iframe siempre queda montado; el modal se superpone, no lo reemplaza. */}
       <PortalFrame ref={iframeRef} />
+      {paymentId && <ReceiptModal key={paymentId} paymentId={paymentId} onClose={closeModal} />}
     </main>
   )
 }
