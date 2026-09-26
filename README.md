@@ -90,3 +90,102 @@ Evaluación Técnica: Desarrollador Frontend Senior
 
 
 ## Parte B. Práctica
+
+Aplicación contenedora en React, TypeScript y Vite que valida un token, embebe un portal de pagos servido en otro puerto y recibe el pago por postMessage para enviar el comprobante por correo.
+
+### Requisitos
+
+- Node.js 22.12 o superior (el repositorio incluye `.nvmrc` con Node 24).
+- npm.
+
+### Cómo ejecutarlo
+
+```bash
+nvm use        # opcional, si se usa nvm
+npm install
+npm run dev
+```
+
+`npm run dev` levanta dos servidores:
+
+- Contenedor: http://localhost:5173
+- Portal de pagos: http://localhost:5174
+
+La API se simula con msw en el navegador, no hace falta levantar un backend.
+
+### Cómo probarlo
+
+- Acceso válido: http://localhost:5173/?token=token-valido
+- Acceso no autorizado: http://localhost:5173/?token=cualquier-otro o http://localhost:5173/
+
+Flujo:
+
+1. Con el token válido se muestra el usuario, el token desaparece de la URL y se carga el portal en el iframe.
+2. En el portal, el botón "Aplicar pago" envía `{ type: 'payment.applied', paymentId }` al contenedor.
+3. El contenedor abre el modal de comprobante: se agregan de 1 a 5 correos válidos y se envía.
+4. Al cerrar el modal (botón Cerrar o Escape) el iframe mantiene su estado.
+
+### Pruebas
+
+```bash
+npm test
+```
+
+Pruebas principales pedidas:
+
+- Token inválido: `src/App.test.tsx`
+- Mensaje de un origen no permitido: `src/App.test.tsx` y `src/hooks/usePortalMessages.test.tsx`
+- Validación de correos: `src/components/ReceiptModal.test.tsx` y `src/lib/emails.test.ts`
+
+También cubren: token válido en StrictMode, mensajes con estructura inesperada o de otra ventana, limpieza del listener, doble clic en Enviar, reintento con la misma clave de idempotencia, que el iframe no se recarga al cerrar el modal y la configuración en tiempo de ejecución.
+
+### Otros comandos
+
+- `npm run build`: compila el contenedor en `dist/`.
+- `npm run build:portal`: compila el portal en `portal/dist/`.
+- `npm run lint`: revisa el código con oxlint.
+- `npm run test:watch`: pruebas en modo observación.
+
+### Docker
+
+La misma imagen sirve para cualquier ambiente. Las URLs se leen de un `config.js` que se genera al arrancar el contenedor a partir de variables de entorno.
+
+```bash
+docker compose up --build
+```
+
+- Contenedor: http://localhost:8080/?token=token-valido
+- Portal: http://localhost:8081
+
+Variables de entorno:
+
+| Imagen | Variable | Descripción |
+|---|---|---|
+| app | `PORTAL_URL` | URL del portal embebido |
+| app | `PORTAL_ORIGIN` | Origen del portal, usado en `frame-src` de la CSP |
+| app | `ENABLE_MOCKS` | `true` para usar la API simulada (no hay backend real) |
+| portal | `CONTAINER_ORIGIN` | Origen del contenedor, destino del postMessage y `frame-ancestors` |
+
+### Estructura
+
+```
+src/
+  api/          llamadas a la API (validar token, enviar comprobante)
+  components/   PaymentContainer, PortalFrame, ReceiptModal, Unauthorized
+  hooks/        useTokenAuth, usePortalMessages
+  lib/          validación de correos y de mensajes del portal
+  mocks/        handlers de msw (navegador y pruebas)
+  config.ts     configuración en tiempo de ejecución
+portal/         página HTML del portal de pagos
+docker/         plantillas de nginx y config.js, script de arranque
+```
+
+### Decisiones
+
+- Solo frontend: el enunciado pide una API simulada. msw intercepta `fetch` tanto en el navegador como en las pruebas, así que el código es el mismo que con un backend real.
+- Token: se lee una sola vez, se elimina de la URL de inmediato con `history.replaceState` (sea válido o no) y se envía a la API en el body, no en la URL. En producción el backend lo cambiaría por una sesión en cookie `HttpOnly`.
+- Seguridad de mensajes: se valida el origen exacto, que `event.source` sea el iframe y la estructura del mensaje. El portal envía a un `targetOrigin` explícito, nunca `'*'`.
+- Iframe sin recargas: el iframe queda siempre montado y memoizado; el modal se renderiza al lado, no en su lugar.
+- Envíos duplicados: el botón se bloquea con un `ref` síncrono y cada comprobante lleva un `Idempotency-Key`. La API simulada devuelve la misma respuesta si la clave se repite, que es la garantía real que debe dar el backend.
+- Configuración: `window.__APP_CONFIG__` tiene prioridad sobre las variables de Vite, para no recompilar por ambiente.
+- CSP: las plantillas de nginx aplican `frame-src` solo al portal y `frame-ancestors` restringido en ambos lados.
