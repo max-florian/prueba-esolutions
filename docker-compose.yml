@@ -1,0 +1,23 @@
+# Ejemplo de un ambiente. Para certificación o producción se usa la misma imagen
+# y solo cambian estas variables.
+services:
+  app:
+    build:
+      context: .
+      target: app
+    ports:
+      - '8080:80'
+    environment:
+      PORTAL_URL: http://localhost:8081/
+      PORTAL_ORIGIN: http://localhost:8081
+      # Sin backend real, la demo usa la API simulada también en la imagen.
+      ENABLE_MOCKS: 'true'
+
+  portal:
+    build:
+      context: .
+      target: portal
+    ports:
+      - '8081:80'
+    environment:
+      CONTAINER_ORIGIN: http://localhost:8080

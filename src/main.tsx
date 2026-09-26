@@ -2,9 +2,10 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
+import { config } from './config.ts'
 
 async function enableMocking() {
-  if (!import.meta.env.DEV) return
+  if (!config.enableMocks) return
   const { worker } = await import('./mocks/browser.ts')
   await worker.start({ onUnhandledRequest: 'bypass' })
 }

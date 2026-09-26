@@ -1,0 +1,25 @@
+server {
+    listen 80;
+    root /usr/share/nginx/html;
+
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; worker-src 'self'; frame-src ${PORTAL_ORIGIN}; frame-ancestors 'none'; base-uri 'none'; object-src 'none'; form-action 'self'" always;
+    add_header Referrer-Policy "no-referrer" always;
+    add_header X-Content-Type-Options "nosniff" always;
+
+    # Se usa expires (y no add_header) para no perder los headers de seguridad del server.
+    location = /config.js {
+        expires -1;
+    }
+
+    location = /index.html {
+        expires -1;
+    }
+
+    location /assets/ {
+        expires 1y;
+    }
+
+    location / {
+        try_files $uri /index.html;
+    }
+}

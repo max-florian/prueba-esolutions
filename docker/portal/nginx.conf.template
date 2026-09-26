@@ -1,0 +1,16 @@
+server {
+    listen 80;
+    root /usr/share/nginx/html;
+
+    # Solo el contenedor puede embeber el portal.
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; frame-ancestors ${CONTAINER_ORIGIN}; base-uri 'none'; object-src 'none'" always;
+    add_header X-Content-Type-Options "nosniff" always;
+
+    location = /config.js {
+        expires -1;
+    }
+
+    location / {
+        try_files $uri /index.html;
+    }
+}

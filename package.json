@@ -8,6 +8,7 @@
     "dev:app": "vite",
     "dev:portal": "vite portal",
     "build": "tsc -b && vite build",
+    "build:portal": "vite build portal",
     "lint": "oxlint",
     "preview": "vite preview",
     "test": "vitest run",

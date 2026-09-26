@@ -1,5 +1,9 @@
 // Origen exacto del contenedor. Nunca se usa '*' como targetOrigin.
-const CONTAINER_ORIGIN = import.meta.env.VITE_CONTAINER_ORIGIN ?? 'http://localhost:5173'
+// Prioridad: config en runtime > variable de Vite > valor de desarrollo.
+const CONTAINER_ORIGIN =
+  window.__PORTAL_CONFIG__?.containerOrigin ||
+  import.meta.env.VITE_CONTAINER_ORIGIN ||
+  'http://localhost:5173'
 
 const button = document.getElementById('apply-payment')
 const status = document.getElementById('status')
