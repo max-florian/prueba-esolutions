@@ -67,6 +67,8 @@ export function ReceiptModal({ paymentId, onClose }: ReceiptModalProps) {
     try {
       await sendReceipt({ paymentId, emails }, idempotencyKey)
       setStatus('sent')
+      setDraft('')
+      setEmailError(null)
     } catch (error) {
       console.error(error)
       setStatus('error')
@@ -109,15 +111,16 @@ export function ReceiptModal({ paymentId, onClose }: ReceiptModalProps) {
           )}
         </form>
 
-        <p>
+        <p className="hint">
           {emails.length}/{MAX_EMAILS} correos
         </p>
-        <ul aria-label="Correos agregados">
+        <ul className="email-list" aria-label="Correos agregados">
           {emails.map((email) => (
             <li key={email}>
-              {email}{' '}
+              <span>{email}</span>
               <button
                 type="button"
+                className="btn-link"
                 onClick={() => handleRemoveEmail(email)}
                 disabled={isLocked}
                 aria-label={`Quitar ${email}`}
@@ -128,7 +131,11 @@ export function ReceiptModal({ paymentId, onClose }: ReceiptModalProps) {
           ))}
         </ul>
 
-        {status === 'sent' && <p role="status">Comprobante enviado.</p>}
+        {status === 'sent' && (
+          <p role="status" className="success">
+            Comprobante enviado.
+          </p>
+        )}
         {status === 'error' && (
           <p role="alert" className="error">
             No se pudo enviar el comprobante. Intenta de nuevo.
@@ -139,7 +146,7 @@ export function ReceiptModal({ paymentId, onClose }: ReceiptModalProps) {
           <button type="button" onClick={onClose}>
             Cerrar
           </button>
-          <button type="button" onClick={handleSend} disabled={!canSend}>
+          <button type="button" className="btn-primary" onClick={handleSend} disabled={!canSend}>
             {status === 'sending' ? 'Enviando…' : 'Enviar'}
           </button>
         </div>

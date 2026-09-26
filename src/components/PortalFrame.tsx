@@ -16,7 +16,7 @@ export const PortalFrame = memo(function PortalFrame({ ref }: PortalFrameProps) 
       // allow-same-origin mantiene el origen real del portal; sin él llegaría como "null".
       sandbox="allow-scripts allow-forms allow-same-origin"
       referrerPolicy="no-referrer"
-      style={{ width: '100%', height: 320, border: '1px solid #d0d7de' }}
+      className="portal-frame"
     />
   )
 })

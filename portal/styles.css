@@ -1,6 +1,39 @@
 body {
   margin: 0;
-  padding: 1rem;
+  padding: 1.5rem;
   font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.5;
+  color: #1f2328;
   background: #f6f8fa;
+}
+
+h2 {
+  margin-top: 0;
+}
+
+.btn-primary {
+  min-height: 2.75rem;
+  padding: 0.6rem 1.4rem;
+  border: 1px solid #1a7f37;
+  border-radius: 8px;
+  background: #1a7f37;
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.btn-primary:hover {
+  background: #116329;
+}
+
+.btn-primary:focus-visible {
+  outline: 3px solid rgb(26 127 55 / 0.35);
+  outline-offset: 1px;
+}
+
+#status {
+  color: #59636e;
+  word-break: break-all;
 }
